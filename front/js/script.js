@@ -1,20 +1,30 @@
-const HOST = "http://localhost:3000"; 
-fetch(HOST + '/api/products')
-    .then(function(res){
-        if(res.ok){
-            return res.json();
-        }
-    })
-    .then(function(products){
-        //let product = products[0];
-        console.log(products.length);
-        let elt = document.getElementById('items');
-        let productsList = "";
+const WEB_SERVICE = "http://localhost:3000/api/products";
 
-        for (let index = 0; index < products.length; index++) {
-            const product = products[index];
-            console.log(product);
-            let innerHtml = `
+/**
+ * Get all products from web service API
+ * @param {any} url
+ * @returns {any}
+ */
+function getAllProducts(url) {
+    fetch(url)
+        .then(function (res) {
+            if (res.ok) {
+                return res.json();
+            }
+        })
+        .then(function (products) {
+            //let product = products[0];
+            //console.log(products.length);
+            let elt = document.getElementById('items');
+
+            // variable necessaire pour collecter tous les produits en forme HTML
+            let productsList = "";
+
+            // 1er forme de boucle
+            for (let index = 0; index < products.length; index++) {
+                const product = products[index];
+                //console.log(product);
+                let innerHtml = `
             <a href="./product.html?id=${product._id}">
                 <article>
                     <img src="${product.imageUrl}" alt="${product.altTxt}">
@@ -22,35 +32,34 @@ fetch(HOST + '/api/products')
                     <p class="productDescription">${product.description}</p>
                 </article>
             </a>`;
-            productsList += innerHtml;
-        }
+                productsList += innerHtml;
+            }
 
-        elt.innerHTML = productsList;
 
-        /*
-        products.forEach((index, product) => {
-            let innerHtml = document.createElement(`
+            // 2ieme forme de boucle
+            /*
+            products.forEach((product, index) => {
+                //console.log(product);
+                let innerHtml = `
             <a href="./product.html?id=${product._id}">
                 <article>
                     <img src="${product.imageUrl}" alt="${product.altTxt}">
                     <h3 class="productName">${product.name}</h3>
                     <p class="productDescription">${product.description}</p>
                 </article>
-            </a>`);
-            elt.appendChild(innerHtml);
+            </a>`;
+                productsList += innerHtml;
+            });
+            */
+
+            // Modification dynalique de la section id=items
+            elt.innerHTML = productsList;
+
+        })
+        .catch(function (err) {
+            //console.log(err);
         });
-        */
-        /*
-        elt.innerHTML = `
-        <a href="./product.html?id=${product._id}">
-            <article>
-                <img src="${product.imageUrl}" alt="${product.altTxt}">
-                <h3 class="productName">${product.name}</h3>
-                <p class="productDescription">${product.description}</p>
-            </article>
-        </a>`;
-        */
-    })
-    .catch(function(err){
-        console.log(err);
-    });
+}
+
+// Alimentation de la page d'Accueil avec tous les produits.
+document.addEventListener("DOMContentLoaded", getAllProducts(WEB_SERVICE));
