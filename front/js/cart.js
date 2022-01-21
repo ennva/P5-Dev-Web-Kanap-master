@@ -12,7 +12,6 @@ if (orderId) {
   document.getElementById("orderId").innerText = orderId;
 }
 
-
 /**
  * Function pour Appeller l'API et obtenir l'info sur le Produit
  * @param {any} id du produit
@@ -351,6 +350,7 @@ function order(event) {
   }
 
   if (submit) {
+    let productInCart = false;
     orderJson.contact.firstName = HTMLEncode(firstname);
     orderJson.contact.lastName = HTMLEncode(lastname);
     orderJson.contact.address = HTMLEncode(address);
@@ -358,16 +358,27 @@ function order(event) {
     orderJson.contact.email = email;
 
     console.log(localStorage);
+    let countProduct = 0;
     for (let i = 0; i < localStorage.length; i++) {
       let categorie = localStorage.key(i);
       let produits_de_la_categorie = JSON.parse(localStorage.getItem(categorie));
+      countProduct += produits_de_la_categorie.length;
       for (let j in produits_de_la_categorie) {
         product = produits_de_la_categorie[j];
+        console.log(product);
         orderJson.products.push(product.id);
       }
     }
     //console.log(orderJson);
-    sendOrder(orderJson);
+    if(countProduct > 0){
+      sendOrder(orderJson);
+    } else {
+      let messageDiv = document.createElement('div');
+      messageDiv.innerText  = "Pas de produit dans le panier";
+      messageDiv.style.color = 'red';
+      document.getElementById("order").parentNode.insertBefore(messageDiv,document.getElementById("order").nextSibling);
+
+    }
   }
 }
 
